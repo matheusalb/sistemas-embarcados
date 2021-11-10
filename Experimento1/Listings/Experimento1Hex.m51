@@ -1,0 +1,112 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    10/01/2021  00:57:05  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\Experimento1.obj TO .\Objects\Experimento1Hex PRINT (.\List
+>> ings\Experimento1Hex.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\Experimento1.obj (EXPERIMENTO1)
+
+
+LINK MAP OF MODULE:  .\Objects\Experimento1Hex (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            IDATA   0008H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     07FDH                  *** GAP ***
+            CODE    0800H     0034H     UNIT         ?PR?MAIN?EXPERIMENTO1
+            CODE    0834H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Experimento1Hex (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?EXPERIMENTO1
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Experimento1Hex (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0834H         SEGMENT       ?C_C51STARTUP
+  I:0008H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  10/01/2021  00:57:05  PAGE 2
+
+
+  C:0837H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0834H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0834H         LINE#         133
+  C:0836H         LINE#         134
+  C:0837H         LINE#         135
+  C:0838H         LINE#         136
+  C:083AH         LINE#         185
+  C:083DH         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        EXPERIMENTO1
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  C:0800H         PUBLIC        main
+  -------         PROC          MAIN
+  C:0800H         LINE#         3
+  C:0800H         LINE#         4
+  C:0800H         LINE#         7
+  C:0808H         LINE#         9
+  C:0816H         LINE#         12
+  C:0819H         LINE#         15
+  C:0821H         LINE#         17
+  C:082FH         LINE#         20
+  C:0832H         LINE#         21
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        EXPERIMENTO1
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0043H BYTE ( 3%) *
+******************************************************************************
+
+Program Size: data=9.0 xdata=0 code=67
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
