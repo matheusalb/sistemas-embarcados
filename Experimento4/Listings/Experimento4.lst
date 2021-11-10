@@ -1,0 +1,83 @@
+C51 COMPILER V9.60.0.0   EXPERIMENTO4                                                      10/25/2021 14:26:37 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EXPERIMENTO4
+OBJECT MODULE PLACED IN .\Objects\Experimento4.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Experimento4.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\Experimento4.lst) TABS(2) OBJECT(.\Objects\Experimento4.obj)
+
+line level    source
+
+   1          #include <REG51F.H>
+   2          
+   3          // Com SMOD = 1 temos TH1 ~ 203.92 ~ 204 -> Nesse caso obtive um BaudRate de 1200 bps (ESCOLHIDO!)
+   4          // Com SMOD = 0 temos TH1 ~ 229.958 ~ 230 -> Nesse caso obtive um BaudRate de 1201 bps
+   5          // TH1_RECARGA = 256 - 2^(SMOD)*12000000/(12*32*1200) <- Formula utilizada para calcular o valor de TH1 ac
+             -ima, leia-se ^ como operador potência 
+   6          #define TH1_RECARGA 204
+   7          
+   8          bit chegouNovoByte = 0;
+   9          char byteLido;
+  10          
+  11          void timer1_inicializa() {
+  12   1        TR1 = 0; // Desligar timer1
+  13   1        TMOD = (TMOD & 0x0F) | 0x20; // Faz gate = 0 , C/T = 0, M1 = 1 e M0 = 0 => Ativa modo 2; Observação que n
+             -o caso do timer 1 utilizamos os 4 bits mais significativos para setar o TMOD com as configurações desejadas
+  14   1        
+  15   1        TH1 = TH1_RECARGA; // Programa valor de recarga do Timer 1.
+  16   1        TL1 = TH1_RECARGA; // Faço a primeira recarga manualmente, já que a recarga ocorre quando ocorre overflow
+             - no TL1.
+  17   1        ET1 = 0; // Desabilita interrupção do timer 1. (não vai ser necessário)
+  18   1        TR1 = 1;  // Liga timer1.
+  19   1      }
+  20          
+  21          void serial_inicializa() {
+  22   1        SCON = (SCON & 0x0F) | 0x50; // Faz SM0 = 0 SM1 = 1 => ativa modo 1; SM2 = 0; REN = 1
+  23   1        PCON = PCON | 0x80; // Ativo o bit mais significativo de PCON, basicamente SMOD = 1
+  24   1      }
+  25          
+  26          void comunicacaoSerial() interrupt 4 using 2 {
+  27   1        // Verifico tanto transmissao quanto recepção pois é full-duplex
+  28   1        if (TI) {
+  29   2          TI = 0; // Zero o TI pois não é feito automaticamente 
+  30   2        }
+  31   1        
+  32   1        if (RI) {
+  33   2          RI = 0; // Zero o RI pois não é feito automaticamente
+  34   2          
+  35   2          byteLido = SBUF; // salvo o caracter lido em uma variavel auxiliar
+  36   2          chegouNovoByte = 1; // ligo a flag indicando que li um novo caracter
+  37   2        }
+  38   1      }
+  39          
+  40          void main() {
+  41   1        EA = 1;   // Habilito o tratamento de interrupções
+  42   1        ES = 1;   // Habilito o tratatemento da interrupção serial
+  43   1        timer1_inicializa();
+  44   1        serial_inicializa();
+  45   1      
+  46   1        while (1) {
+  47   2          // Verifico se chegou um novo byte
+  48   2          if (chegouNovoByte) {
+  49   3              chegouNovoByte = 0; // Desligo a flag
+  50   3              byteLido++; // Somo um ao caractere lido
+  51   3              SBUF = byteLido; // Envio o novo byte pelo barramento serial
+C51 COMPILER V9.60.0.0   EXPERIMENTO4                                                      10/25/2021 14:26:37 PAGE 2   
+
+  52   3          }
+  53   2        } 
+  54   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     71    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
