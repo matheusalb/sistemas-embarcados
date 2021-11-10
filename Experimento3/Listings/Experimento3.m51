@@ -1,0 +1,218 @@
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                    10/22/2021  00:07:02  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.2.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\Experimento3.obj TO .\Objects\Experimento3 PRINT (.\Listing
+>> s\Experimento3.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\Experimento3.obj (EXPERIMENTO3)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\Experimento3 (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0004H     UNIT         ?DT?EXPERIMENTO3
+            IDATA   000CH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     008CH     UNIT         ?C_C51STARTUP
+            CODE    088CH     003BH     UNIT         ?PR?MAQUINAESTADOP2_1?EXPERIMENTO3
+            CODE    08C7H     0039H     UNIT         ?PR?MAQUINAESTADOP2_0?EXPERIMENTO3
+            CODE    0900H     001FH     UNIT         ?PR?TIMER0_INT?EXPERIMENTO3
+            CODE    091FH     0015H     UNIT         ?PR?TIMER0_INICIALIZA?EXPERIMENTO3
+            CODE    0934H     000DH     UNIT         ?PR?MAIN?EXPERIMENTO3
+            CODE    0941H     000DH     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Experimento3 (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?EXPERIMENTO3
+  +--> ?C_INITSEG
+
+?PR?MAIN?EXPERIMENTO3
+  +--> ?PR?TIMER0_INICIALIZA?EXPERIMENTO3
+  +--> ?PR?MAQUINAESTADOP2_0?EXPERIMENTO3
+  +--> ?PR?MAQUINAESTADOP2_1?EXPERIMENTO3
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Experimento3 (?C_STARTUP)
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  10/22/2021  00:07:02  PAGE 2
+
+
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0800H         SEGMENT       ?C_C51STARTUP
+  I:000CH         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0803H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0800H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0800H         LINE#         133
+  C:0802H         LINE#         134
+  C:0803H         LINE#         135
+  C:0804H         LINE#         136
+  C:0806H         LINE#         185
+  C:0809H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        EXPERIMENTO3
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  C:0900H         PUBLIC        timer0_int
+  D:00A0H         PUBLIC        P2
+  B:00A8H.7       PUBLIC        EA
+  B:00A0H.0       PUBLIC        P2_0
+  B:00A0H.1       PUBLIC        P2_1
+  B:00D0H.7       PUBLIC        CY
+  C:0934H         PUBLIC        main
+  D:0089H         PUBLIC        TMOD
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  D:000AH         PUBLIC        contador_P2_0
+  D:000BH         PUBLIC        contador_P2_1
+  B:0088H.4       PUBLIC        TR0
+  C:091FH         PUBLIC        timer0_inicializa
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  10/22/2021  00:07:02  PAGE 3
+
+
+  C:08C7H         PUBLIC        maquinaEstadoP2_0
+  C:088CH         PUBLIC        maquinaEstadoP2_1
+  -------         PROC          MAQUINAESTADOP2_0
+  -------         DO            
+  D:0008H         SYMBOL        estado
+  -------         ENDDO         
+  C:08C7H         LINE#         18
+  C:08C7H         LINE#         21
+  C:08D1H         LINE#         22
+  C:08D1H         LINE#         24
+  C:08D4H         LINE#         25
+  C:08D7H         LINE#         26
+  C:08D8H         LINE#         27
+  C:08D8H         LINE#         29
+  C:08DBH         LINE#         30
+  C:08E7H         LINE#         31
+  C:08EAH         LINE#         32
+  C:08EDH         LINE#         33
+  C:08EDH         LINE#         34
+  C:08EEH         LINE#         35
+  C:08EEH         LINE#         37
+  C:08F9H         LINE#         38
+  C:08FCH         LINE#         39
+  C:08FFH         LINE#         40
+  C:08FFH         LINE#         42
+  C:08FFH         LINE#         43
+  C:08FFH         LINE#         44
+  -------         ENDPROC       MAQUINAESTADOP2_0
+  -------         PROC          MAQUINAESTADOP2_1
+  -------         DO            
+  D:0009H         SYMBOL        estado
+  -------         ENDDO         
+  C:088CH         LINE#         46
+  C:088CH         LINE#         49
+  C:0898H         LINE#         50
+  C:0898H         LINE#         52
+  C:089BH         LINE#         53
+  C:089EH         LINE#         54
+  C:089FH         LINE#         55
+  C:089FH         LINE#         57
+  C:08A2H         LINE#         58
+  C:08AEH         LINE#         59
+  C:08B1H         LINE#         61
+  C:08B4H         LINE#         62
+  C:08B4H         LINE#         63
+  C:08B5H         LINE#         64
+  C:08B5H         LINE#         66
+  C:08C0H         LINE#         67
+  C:08C3H         LINE#         68
+  C:08C6H         LINE#         69
+  C:08C6H         LINE#         70
+  C:08C6H         LINE#         71
+  C:08C6H         LINE#         72
+  -------         ENDPROC       MAQUINAESTADOP2_1
+  -------         PROC          TIMER0_INICIALIZA
+  C:091FH         LINE#         74
+  C:091FH         LINE#         75
+BL51 BANKED LINKER/LOCATER V6.22.2.0                                                  10/22/2021  00:07:02  PAGE 4
+
+
+  C:0921H         LINE#         76
+  C:0929H         LINE#         77
+  C:092CH         LINE#         78
+  C:092FH         LINE#         79
+  C:0931H         LINE#         80
+  C:0933H         LINE#         81
+  -------         ENDPROC       TIMER0_INICIALIZA
+  -------         PROC          TIMER0_INT
+  C:0900H         LINE#         83
+  C:0904H         LINE#         84
+  C:0906H         LINE#         85
+  C:090CH         LINE#         86
+  C:0914H         LINE#         87
+  C:0916H         LINE#         92
+  C:0918H         LINE#         93
+  C:091AH         LINE#         94
+  -------         ENDPROC       TIMER0_INT
+  -------         PROC          MAIN
+  C:0934H         LINE#         96
+  C:0934H         LINE#         98
+  C:0937H         LINE#         99
+  C:0939H         LINE#         100
+  C:0939H         LINE#         101
+  C:093CH         LINE#         102
+  C:093FH         LINE#         103
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        EXPERIMENTO3
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00D3H BYTE (10%) *
+******************************************************************************
+
+Program Size: data=13.0 xdata=0 code=340
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

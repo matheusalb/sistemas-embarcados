@@ -1,0 +1,133 @@
+C51 COMPILER V9.60.0.0   EXPERIMENTO3                                                      10/22/2021 00:07:02 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EXPERIMENTO3
+OBJECT MODULE PLACED IN .\Objects\Experimento3.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Experimento3.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\Experimento3.lst) TABS(2) OBJECT(.\Objects\Experimento3.obj)
+
+line level    source
+
+   1          #include <REG51F.H>
+   2          
+   3          #define CORRECAO 10
+   4          #define FrClk 12000000
+   5          #define FreqTimer0_emHz 100
+   6          #define TH0_Inicial ((65536-(FrClk/(12*FreqTimer0_emHz))+CORRECAO)>>8)
+   7          #define TL0_Inicial ((65536-(FrClk/(12*FreqTimer0_emHz))+CORRECAO)&0xFF)
+   8          
+   9          sbit P2_0 = P2^0;
+  10          sbit P2_1 = P2^1;
+  11          
+  12          unsigned char contador_P2_0 = 0;
+  13          unsigned char contador_P2_1 = 0;
+  14          
+  15          enum estado{MonitoraP2_0, Esperar, EsperaP2_0_ser0,
+  16                      MonitoraP2_1, EsperaP2_1_ser0};
+  17            
+  18          void maquinaEstadoP2_0() {
+  19   1        static char estado = EsperaP2_0_ser0;
+  20   1        
+  21   1        switch (estado) {
+  22   2          case EsperaP2_0_ser0:
+  23   2            // Espera o P2.0 ser 0
+  24   2            if (P2_0 == 0) 
+  25   2              estado = MonitoraP2_0;
+  26   2            break;
+  27   2          case MonitoraP2_0:
+  28   2            // Verifica se houve transição de 0 para 1 de P2.0
+  29   2            if (P2_0 == 1) {
+  30   3              P1 = (P1 & 0xF0) | (P0 & 0x0F);
+  31   3              estado = Esperar;
+  32   3              contador_P2_0 = 0;
+  33   3            }
+  34   2            break;
+  35   2          case Esperar:
+  36   2            // Espera 1 segundo. (100 * 10ms = 1 segundo)
+  37   2            if (contador_P2_0 >= 100) {
+  38   3              P1 = P1 & 0xF0;
+  39   3              estado = EsperaP2_0_ser0;
+  40   3            }
+  41   2            
+  42   2            break;
+  43   2        }
+  44   1      }
+  45          
+  46          void maquinaEstadoP2_1() {
+  47   1        static char estado = EsperaP2_1_ser0;
+  48   1        
+  49   1        switch(estado) {
+  50   2          case EsperaP2_1_ser0:
+  51   2            // Espera P2.1 ser 0
+  52   2            if (P2_1 == 0)
+  53   2              estado = MonitoraP2_1;
+  54   2            break;
+C51 COMPILER V9.60.0.0   EXPERIMENTO3                                                      10/22/2021 00:07:02 PAGE 2   
+
+  55   2          case MonitoraP2_1:
+  56   2            // Verifica se houve transição de 0 para 1 de P2.1
+  57   2            if (P2_1 == 1) {
+  58   3              P1 = (P1 & 0x0F) | (P0 & 0xF0);
+  59   3              estado = Esperar;
+  60   3              // Zero o contador para contar novamente 1 segundo.
+  61   3              contador_P2_1 = 0;
+  62   3            }
+  63   2            break;
+  64   2          case Esperar:
+  65   2            // Espera 1 segundo. (100 * 10ms = 1 segundo)
+  66   2            if (contador_P2_1 >= 100) {
+  67   3              P1 = P1 & 0x0F;
+  68   3              estado = EsperaP2_1_ser0;
+  69   3            }
+  70   2            break;
+  71   2        }
+  72   1      }
+  73          
+  74          void timer0_inicializa() {
+  75   1        TR0 = 0; // Desligar timer0
+  76   1        TMOD = (TMOD & 0xF0) | 0x01; // Faz gate = 0 , C/T = 0, M1 = 0 e M0 = 1 => Ativa modo 1.
+  77   1        TH0 = TH0_Inicial; // Programa valor de contagem do Timer0.
+  78   1        TL0 = TL0_Inicial;
+  79   1        ET0 = 1; // Habilita interrupção do timer 0.
+  80   1        TR0 = 1;  // Liga timer0.
+  81   1      }
+  82          
+  83          void timer0_int(void) interrupt 1 using 2 {
+  84   1        TR0 = 0; // Desliga Timer0
+  85   1        TL0 += TL0_Inicial; // Faz recarga da contagem do timer0
+  86   1        TH0 += TH0_Inicial + (unsigned char) CY;
+  87   1        TR0 = 1; //Habilita contagem do timer0
+  88   1        
+  89   1        // Instruções acima demoram 0.000010 segundos, e como o 12Mhz/12 = 1Mhz, fazendo 1Mhz * 0.000010s temos u
+             -m fator de correção de 10.
+  90   1        
+  91   1        // Incrementa contadores
+  92   1        contador_P2_0++;
+  93   1        contador_P2_1++;
+  94   1      }
+  95          
+  96          void main() {
+  97   1        // Inicializando o nosso timer0
+  98   1        timer0_inicializa();
+  99   1        EA = 1; // Habilitando o tratamento de interrupções.
+ 100   1        while (1) {
+ 101   2          maquinaEstadoP2_0();
+ 102   2          maquinaEstadoP2_1();
+ 103   2        }
+ 104   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    181    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.60.0.0   EXPERIMENTO3                                                      10/22/2021 00:07:02 PAGE 3   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
