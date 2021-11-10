@@ -1,0 +1,202 @@
+C51 COMPILER V9.60.0.0   EXPERIMENTO5                                                      10/31/2021 16:10:50 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EXPERIMENTO5
+OBJECT MODULE PLACED IN .\Objects\Experimento5.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Experimento5.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\Experimento5.lst) TABS(2) OBJECT(.\Objects\Experimento5.obj)
+
+line level    source
+
+   1          // Aluno: Matheus Viana Coelho Albuquerque
+   2          
+   3          #include <REG51F.H>
+   4          
+   5          #define TAMANHO_BUFFER 16
+   6          #define TH1_RECARGA 204
+   7          
+   8          // Estrutura para representar o buffer circular
+   9          typedef struct {
+  10            char buffer[TAMANHO_BUFFER];
+  11            unsigned char in;
+  12            unsigned char out;
+  13          }CircularBuffer;
+  14          
+  15          CircularBuffer TxBuffer;
+  16          CircularBuffer RxBuffer;
+  17          bit RecebeuString = 0;
+  18          bit txOcupado = 0;
+  19          
+  20          void SendChar(char c) {
+  21   1        /*Função que recebe o byte “c” e insere em TxBuffer.
+  22   1        Ativa a transmissão serial, caso ainda não esteja ativa.*/
+  23   1        
+  24   1        // Para inserir o byte em TxBuffer preciso saber se ele não está cheio
+  25   1        if (((TxBuffer.in + 1)%TAMANHO_BUFFER) != TxBuffer.out) {
+  26   2          // Caso o TxBuffer não esteja cheio
+  27   2          // Insiro no buffer
+  28   2          TxBuffer.buffer[TxBuffer.in] = c;
+  29   2          // Incremento o TxBufferIn
+  30   2          TxBuffer.in = (TxBuffer.in + 1)%TAMANHO_BUFFER;
+  31   2        }
+  32   1        
+  33   1        // Verifica se o TxBuffer está ocupando transmitindo informação para a interface serial
+  34   1        if (!txOcupado) {
+  35   2          // Caso não esteja ocupado, ocupo-o e ativo a transmissão serial
+  36   2          txOcupado = 1;
+  37   2          TI = 1;
+  38   2        }
+  39   1          
+  40   1      }
+  41          
+  42          void SendString(char *s) {
+  43   1        //Função que insere a string apontada por “*s” em TxBuffer usando a função SendChar(c).
+  44   1        
+  45   1        int i = 0;
+  46   1        char curCharacter;
+  47   1        // Loop que envia os caracteres da string para TxBuffer por meio de SendChar
+  48   1        do{
+  49   2          curCharacter = s[i];
+  50   2          SendChar(curCharacter);
+  51   2          i++;
+  52   2        }while(curCharacter != '$');
+  53   1      }
+  54          
+C51 COMPILER V9.60.0.0   EXPERIMENTO5                                                      10/31/2021 16:10:50 PAGE 2   
+
+  55          char RxBufferVazio() {
+  56   1        // Função que retorna 1 caso o buffer circular de recepção esteja vazio e 0 em caso contrário.
+  57   1        char vazio = 0;
+  58   1        if (RxBuffer.in == RxBuffer.out)
+  59   1          vazio = 1;
+  60   1        return vazio;
+  61   1      }
+  62          
+  63          char TxBufferVazio() {
+  64   1        // Função que retorna 1 caso o buffer circular de transmissao esteja vazio e 0 em caso contrário.
+  65   1        char vazio = 0;
+  66   1        if (TxBuffer.in == TxBuffer.out)
+  67   1          vazio = 1;
+  68   1        return vazio;
+  69   1      }
+  70          
+  71          char ReceiveChar() {
+  72   1        // Função que retorna um byte de RxBuffer
+  73   1        
+  74   1        char character = 0;
+  75   1        // Verifico se o RxBuffer não está vazio para retornar um caracter
+  76   1        if (!RxBufferVazio()) {
+  77   2          character = RxBuffer.buffer[RxBuffer.out];
+  78   2          RxBuffer.out = (RxBuffer.out + 1)%TAMANHO_BUFFER; 
+  79   2        }
+  80   1        return character;
+  81   1      }
+  82          
+  83          
+  84          void ReceiveString(char *s) {
+  85   1        // Função que copia uma string de RxBuffer para o local apontado por “*s”, usando a função ReceiveChar().
+  86   1        char character;
+  87   1        int i = 0;
+  88   1        do {
+  89   2          // Loop para ler o caracter do RxBuffer e adiconar a string, termina quando encontra o $ indicando o fin
+             -al da string
+  90   2          character = ReceiveChar();
+  91   2          s[i] = character;
+  92   2          i++;
+  93   2        } while(character != '$' && !RxBufferVazio());
+  94   1        
+  95   1        RecebeuString = 0;
+  96   1      } 
+  97          
+  98          void timer1_inicializa() {
+  99   1        TR1 = 0; // Desligar timer1
+ 100   1        TMOD = (TMOD & 0x0F) | 0x20; // Faz gate = 0 , C/T = 0, M1 = 1 e M0 = 0 => Ativa modo 2; Observação que n
+             -o caso do timer 1 utilizamos os 4 bits mais significativos para setar o TMOD com as configurações desejadas
+ 101   1        
+ 102   1        TH1 = TH1_RECARGA; // Programa valor de recarga do Timer 1.
+ 103   1        //TL1 = TH1_RECARGA; // Faço a primeira recarga manualmente, já que a recarga ocorre quando ocorre overfl
+             -ow no TL1.
+ 104   1        ET1 = 0; // Desabilita interrupção do timer 1. (não vai ser necessário)
+ 105   1        TR1 = 1;  // Liga timer1.
+ 106   1      }
+ 107          
+ 108          void serial_inicializa() {
+ 109   1        SCON = (SCON & 0x0F) | 0x50; // Faz SM0 = 0 SM1 = 1 => ativa modo 1; SM2 = 0; REN = 1
+ 110   1        PCON = PCON | 0x80; // Ativo o bit mais significativo de PCON, basicamente SMOD = 1
+ 111   1      }
+ 112          
+ 113          void comunicacaoSerial() interrupt 4 using 2 {
+C51 COMPILER V9.60.0.0   EXPERIMENTO5                                                      10/31/2021 16:10:50 PAGE 3   
+
+ 114   1        char c;
+ 115   1        // Verifico tanto transmissao quanto recepção pois é full-duplex
+ 116   1        if (TI) {
+ 117   2          TI = 0; // Zero o TI pois não é feito automaticamente
+ 118   2          
+ 119   2          if (!TxBufferVazio()) {
+ 120   3            // Se o tx não estiver vazio leio um caracter do TxBuffer e o envio pelo barramento serial
+ 121   3            c = TxBuffer.buffer[TxBuffer.out];
+ 122   3            TxBuffer.out = (TxBuffer.out + 1)%TAMANHO_BUFFER;
+ 123   3            SBUF = c;
+ 124   3          }
+ 125   2          else 
+ 126   2            // Caso Tx tanha sido esvaziado, desocupo-o.
+ 127   2            txOcupado = 0;      
+ 128   2        }
+ 129   1        
+ 130   1        if (RI) {
+ 131   2          RI = 0; // Zero o RI pois não é feito automaticamente
+ 132   2          
+ 133   2          c = SBUF; // salvo o caracter lido em uma variavel auxiliar
+ 134   2          // Verifico se o RxBuffer não está cheio para inserir o caracter nele
+ 135   2          if (((RxBuffer.in + 1)%TAMANHO_BUFFER) != RxBuffer.out) {
+ 136   3            // Caso o RxBuffer não esteja cheio
+ 137   3            // Insiro no buffer
+ 138   3            RxBuffer.buffer[RxBuffer.in] = c;
+ 139   3            // Incremento o TxBufferIn
+ 140   3            RxBuffer.in = (RxBuffer.in + 1)%TAMANHO_BUFFER;
+ 141   3          }
+ 142   2          if (c == '$')
+ 143   2              RecebeuString = 1;
+ 144   2        }
+ 145   1      }
+ 146          
+ 147          void initCircularBuffer() {
+ 148   1        TxBuffer.in = 0;
+ 149   1        TxBuffer.out = 0;
+ 150   1        RxBuffer.in = 0;
+ 151   1        RxBuffer.out = 0;
+ 152   1      }
+ 153          
+ 154          void main() {
+ 155   1        char s[TAMANHO_BUFFER+1];
+ 156   1        EA = 1;   // Habilito o tratamento de interrupções
+ 157   1        ES = 1;   // Habilito o tratamento da interrupção serial
+ 158   1        initCircularBuffer();
+ 159   1        timer1_inicializa();
+ 160   1        serial_inicializa();
+ 161   1        
+ 162   1        while(1) {
+ 163   2          // Verifico se chegou uma string para enviá-la para interface serial
+ 164   2          if (RecebeuString) {
+ 165   3            ReceiveString(s);
+ 166   3            SendString(s);
+ 167   3          }
+ 168   2        }
+ 169   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    308    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   EXPERIMENTO5                                                      10/31/2021 16:10:50 PAGE 4   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     36      25
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
