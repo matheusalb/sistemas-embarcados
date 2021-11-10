@@ -1,0 +1,99 @@
+C51 COMPILER V9.60.0.0   EXPERIMENTO2                                                      10/21/2021 23:46:06 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE EXPERIMENTO2
+OBJECT MODULE PLACED IN .\Objects\Experimento2.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Experimento2.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\Experimento2.lst) TABS(2) OBJECT(.\Objects\Experimento2.obj)
+
+line level    source
+
+   1          #include <REG51F.H>
+   2          
+   3          sbit P2_0 = P2^0;
+   4          sbit P2_1 = P2^1;
+   5          
+   6          enum estado{MonitoraP2_0, Esperar, EsperaP2_0_ser0,
+   7                      MonitoraP2_1, EsperaP2_1_ser0};
+   8          void maquinaEstadoP2_0() {
+   9   1        static char estado = EsperaP2_0_ser0;
+  10   1        static int contador = 0;
+  11   1        
+  12   1        switch (estado) {
+  13   2          case EsperaP2_0_ser0:
+  14   2            // Espera o P2.0 ser 0
+  15   2            if (P2_0 == 0) 
+  16   2              estado = MonitoraP2_0;
+  17   2            break;
+  18   2          case MonitoraP2_0:
+  19   2            // Verifica se houve transição de 0 para 1 de P2.0
+  20   2            if (P2_0 == 1) {
+  21   3              P1 = (P1 & 0xF0) | (P0 & 0x0F);
+  22   3              estado = Esperar;
+  23   3            }
+  24   2            break;
+  25   2          case Esperar:
+  26   2            // Conta 1 segundo contado via software e muda de estado.
+  27   2            if (contador < 30000)
+  28   2              contador++;
+  29   2            else {
+  30   3              contador = 0;
+  31   3              P1 = P1 & 0xF0;
+  32   3              estado = EsperaP2_0_ser0;
+  33   3            }
+  34   2            break;
+  35   2        }
+  36   1      }
+  37          
+  38          void maquinaEstadoP2_1() {
+  39   1        static char estado = EsperaP2_1_ser0;
+  40   1        static int contador = 0;
+  41   1        
+  42   1        switch(estado) {
+  43   2          case EsperaP2_1_ser0:
+  44   2            // Espera P2.1 ser 0
+  45   2            if (P2_1 == 0)
+  46   2              estado = MonitoraP2_1;
+  47   2            break;
+  48   2          case MonitoraP2_1:
+  49   2            // Verifica se houve transição de 0 para 1 de P2.1
+  50   2            if (P2_1 == 1) {
+  51   3              P1 = (P1 & 0x0F) | (P0 & 0xF0);
+  52   3              estado = Esperar;
+  53   3            }
+  54   2            break;
+C51 COMPILER V9.60.0.0   EXPERIMENTO2                                                      10/21/2021 23:46:06 PAGE 2   
+
+  55   2          case Esperar:
+  56   2            // Conta 1 segundo via software e muda de estado
+  57   2            if (contador < 30000)
+  58   2              contador++;
+  59   2            else {
+  60   3              contador = 0;
+  61   3              P1 = P1 & 0x0F;
+  62   3              estado = EsperaP2_1_ser0;
+  63   3            }
+  64   2            break;
+  65   2        }
+  66   1      }
+  67          
+  68          void main() {
+  69   1        while (1) {
+  70   2          maquinaEstadoP2_0();
+  71   2          maquinaEstadoP2_1();
+  72   2        }
+  73   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    150    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
